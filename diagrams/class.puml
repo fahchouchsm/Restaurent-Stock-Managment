@@ -1,0 +1,84 @@
+@startuml class
+
+class Database {
+    +db: sqlite3.Database
+    +constructor()
+    +testConnection(): void
+    -reconnect(): void
+    -initializeDatabase(): void
+    +createCollection(name: string, description: string): void
+    -generateId(): string
+    +addItemToCollection(collectionId: string, stockItemId: string): void
+    +getCollectionItems(collectionId: string): void
+}
+
+class Meal {
+    +id: string
+    +name: string
+    +ingredients: Map<string, number>
+    +constructor(id: string, name: string, ingredients: Map<string, number>)
+}
+
+class StockItem {
+    +id: string
+    +name: string
+    +quantity: number
+    +unit: string
+    +threshold: number
+    +constructor(id: string, name: string, quantity: number, unit: string, threshold: number)
+    +addStock(amount: number): void
+    +removeStock(amount: number): void
+    +isBelowThreshold(): boolean
+}
+
+class StockCollection {
+    +name: string
+    +description: string
+    +items: List<StockItem>
+    +constructor(name: string, description: string)
+    +addItem(stockItem: StockItem): void
+    +removeItem(id: string): void
+    +getItem(id: string): StockItem
+    +listItems(): List<StockItem>
+    +getLowStockItems(): List<StockItem>
+}
+
+class StockManager {
+    +stockItems: Map<string, StockItem>
+    +meals: Map<string, Meal>
+    +transactions: List<StockTransaction>
+    +addStock(stockItemId: string, amount: number): void
+    +consumeStock(mealId: string, servings: number): void
+    +recordLoss(stockItemId: string, amount: number): void
+    +generateReport(): StockReport
+    +addStockItem(item: StockItem): void
+    +addMeal(meal: Meal): void
+}
+
+class StockTransaction {
+    +id: string
+    +type: 'add' | 'consume' | 'loss'
+    +name: string
+    +stockItemId: string
+    +ingredients: Map<string, number>
+    +quantity: number
+    +timestamp: Date
+    +constructor(id: string, type: 'add' | 'consume' | 'loss', name: string, stockItemId: string, ingredients: Map<string, number>, quantity: number)
+    +getRequiredStock(): Map<string, number>
+    +recordTransaction(manager: StockManager): void
+}
+
+class StockReport {
+    +stockItems: Map<string, StockItem>
+    +transactions: List<StockTransaction>
+}
+
+Database "1" -- "0..*" StockCollection : creates
+StockCollection "1" -- "0..*" StockItem : contains
+StockManager "1" -- "0..*" StockItem : manages
+StockManager "1" -- "0..*" Meal : manages
+StockManager "1" -- "0..*" StockTransaction : records
+StockItem "1" -- "0..*" StockTransaction : referenced_in
+StockTransaction "1" -- "0..*" StockItem : involves
+
+@enduml
