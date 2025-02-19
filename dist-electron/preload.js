@@ -1,15 +1,12 @@
-import { ipcRenderer, contextBridge } from 'electron';
-import { cosResponse, cosResponseData, createCollectionData } from './interfaces/requestsInt';
-import { dbCollection } from './interfaces/databaseInt';
-
-contextBridge.exposeInMainWorld('ipcRenderer', ipcRenderer);
-
-function domReady(condition: DocumentReadyState[] = ['complete', 'interactive']) {
+"use strict";
+var electron = require("electron");
+electron.contextBridge.exposeInMainWorld("ipcRenderer", electron.ipcRenderer);
+function domReady(condition = ["complete", "interactive"]) {
   return new Promise((resolve) => {
     if (condition.includes(document.readyState)) {
       resolve(true);
     } else {
-      document.addEventListener('readystatechange', () => {
+      document.addEventListener("readystatechange", () => {
         if (condition.includes(document.readyState)) {
           resolve(true);
         }
@@ -17,30 +14,20 @@ function domReady(condition: DocumentReadyState[] = ['complete', 'interactive'])
     }
   });
 }
-
 const safeDOM = {
-  append(parent: HTMLElement, child: HTMLElement) {
+  append(parent, child) {
     if (!Array.from(parent.children).find((e) => e === child)) {
       return parent.appendChild(child);
     }
-
     return null;
   },
-  remove(parent: HTMLElement, child: HTMLElement) {
+  remove(parent, child) {
     if (parent && Array.from(parent.children).find((e) => e === child)) {
       return parent.removeChild(child);
     }
-
     return null;
   }
 };
-
-/**
- * https://tobiasahlin.com/spinkit
- * https://connoratherton.com/loaders
- * https://projects.lukehaas.me/css-loaders
- * https://matejkustec.github.io/SpinThatShit
- */
 function useLoading() {
   const styleContent = `
   .sk-chase {
@@ -107,7 +94,6 @@ function useLoading() {
     z-index: 9;
   }
   `;
-
   const htmlContent = `
     <div clas="sk-chase">
       <div class="sk-chase-dot"></div>
@@ -118,16 +104,13 @@ function useLoading() {
       <div class="sk-chase-dot"></div>
     </div>
   `;
-
-  const oStyle = document.createElement('style');
-  const oDiv = document.createElement('div');
-
-  oStyle.id = 'app-loading-style';
+  const oStyle = document.createElement("style");
+  const oDiv = document.createElement("div");
+  oStyle.id = "app-loading-style";
   oStyle.innerHTML = styleContent;
-  oDiv.id = 'loading-to-remove';
-  oDiv.className = 'app-loading-wrap';
+  oDiv.id = "loading-to-remove";
+  oDiv.className = "app-loading-wrap";
   oDiv.innerHTML = htmlContent;
-
   return {
     appendLoading() {
       safeDOM.append(document.head, oStyle);
@@ -139,35 +122,21 @@ function useLoading() {
     }
   };
 }
-
 const { appendLoading, removeLoading } = useLoading();
-
 domReady().then(appendLoading);
-
-declare global {
-  interface Window {
-    Main: typeof api;
-    ipcRenderer: typeof ipcRenderer;
-  }
-}
-
 const api = {
-  sendMessage: (message: string) => {
-    ipcRenderer.send('message', message);
+  sendMessage: (message) => {
+    electron.ipcRenderer.send("message", message);
   },
-  Minimize: (): Promise<string> => ipcRenderer.invoke('minimize'),
+  Minimize: () => electron.ipcRenderer.invoke("minimize"),
   removeLoading: () => {
     removeLoading();
   },
-  // collection handlers
-  createCollection: (data: createCollectionData): Promise<cosResponse> => ipcRenderer.invoke('createCollection', data),
-  getCollections: (): Promise<cosResponseData<dbCollection>> => ipcRenderer.invoke('getCollections'),
-  /**
-   * Provide an easier way to listen to events
-   */
-  on: (channel: string, callback: (data: any) => void) => {
-    ipcRenderer.on(channel, (_, data) => callback(data));
+  createCollection: (data) => electron.ipcRenderer.invoke("createCollection", data),
+  getCollections: () => electron.ipcRenderer.invoke("getCollections"),
+  on: (channel, callback) => {
+    electron.ipcRenderer.on(channel, (_, data) => callback(data));
   }
 };
-
-contextBridge.exposeInMainWorld('Main', api);
+electron.contextBridge.exposeInMainWorld("Main", api);
+//# sourceMappingURL=preload.js.map

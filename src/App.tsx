@@ -1,16 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import SideBar from './components/sideBar';
 import { GestionDesStocks } from './pages/gestionDesStocks/GestionDesStocks';
+import { ipcRenderer } from 'electron';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   console.log(window.ipcRenderer);
-
-  // const sendMessageToElectron = () => {
-  //   if (window.Main) {
-  //     window.Main.sendMessage('common.helloElectron');
-  //   }
-  // };
 
   useEffect(() => {
     window.Main.removeLoading();
@@ -45,6 +41,10 @@ function App() {
           </Routes>
         </div>
       </div>
+      <ToastContainer
+        autoClose={5000}
+        position={'bottom-right'}
+      />
     </BrowserRouter>
   );
 }

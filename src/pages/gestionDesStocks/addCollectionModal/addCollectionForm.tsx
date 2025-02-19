@@ -1,16 +1,19 @@
 import React from 'react';
 import { FC, ChangeEvent, useState } from 'react';
 import { CosButton } from '../../../components/cosButton';
-import { createCollectionData } from '../../../../interfaces/requests';
+import { createCollectionData } from '../../../../electron/interfaces/requestsInt';
+import { toast } from 'react-toastify';
 
 export interface AddCollectionFormInt {
   addCollectionData: createCollectionData;
   setAddCollectionData: (data: createCollectionData) => void;
+  setIsAddCollectionOpen: (e: boolean) => void;
 }
 
 const AddCollectionForm: FC<AddCollectionFormInt> = ({
   addCollectionData,
   setAddCollectionData,
+  setIsAddCollectionOpen,
 }) => {
   const colors = ['#03a9f4', '#f44336', '#4caf50', '#ffeb3b', '#9c27b0'];
   const [loading, setLoading] = useState<boolean>(false);
@@ -28,19 +31,18 @@ const AddCollectionForm: FC<AddCollectionFormInt> = ({
   const handleSubmit = async () => {
     setLoading(true);
     console.log(addCollectionData);
-
-    // try {
-    //   const result = await window.electronAPI.createCollection(
-    //     addCollectionData,
-    //   );
-    //   // alert(result);
-    //   console.log(result);
-    // } catch (error) {
-    //   console.error('❌ Error:', error);
-    //   // alert(error);
-    // } finally {
-    //   setLoading(false);
-    // }
+    const result = await window.Main.createCollection(addCollectionData);
+    if (result.status) {
+      toast.success(
+        'La collection ' + addCollectionData.name + ' a été ajoutée',
+      );
+      setIsAddCollectionOpen(false);
+      setAddCollectionData({ name: '', description: '', color: '#03a9f4' });
+    } else {
+      toast.error("Une erreur s'est produite lors de l'ajout de la collection");
+      console.log(result);
+    }
+    setLoading(false);
   };
 
   return (

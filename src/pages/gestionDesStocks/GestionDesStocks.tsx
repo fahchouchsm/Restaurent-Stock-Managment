@@ -1,30 +1,32 @@
-import { FC, useState } from "react";
-import { Header } from "../../components/header";
-import { Plus } from "lucide-react";
-import { CosModal } from "../../components/cosModal";
-import { AddProductForm } from "./addProductModal/addProductForm";
-import AddProductImg from "./addProductModal/addProductImg";
-import AddCollectionForm from "./addCollectionModal/addCollectionForm";
-import { createCollectionData } from "../../../electron/interfaces/requests";
+import React from 'react';
+import { FC, useState } from 'react';
+import { Header } from '../../components/header';
+import { Plus } from 'lucide-react';
+import { CosModal } from '../../components/cosModal';
+import { AddProductForm } from './addProductModal/addProductForm';
+import AddProductImg from './addProductModal/addProductImg';
+import AddCollectionForm from './addCollectionModal/addCollectionForm';
+import { createCollectionData } from '../../../electron/interfaces/requestsInt';
+import { ShowCollections } from './showCollections/showCollections';
 
 export const GestionDesStocks: FC = () => {
   // product adding
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [addProductData, setAddProductData] = useState({
-    name: "",
+    name: '',
     quantity: 1,
-    unit: "",
+    unit: '',
     threshold: 1,
-    image: "",
+    image: '',
   });
 
   // collection adding
-  const [isAddCollectionOpen, setIsAddCollectionOpen] = useState(true);
+  const [isAddCollectionOpen, setIsAddCollectionOpen] = useState(false);
   const [addCollectionData, setAddCollectionData] =
     useState<createCollectionData>({
-      name: "",
-      description: "",
-      color: "#03a9f4",
+      name: '',
+      description: '',
+      color: '#03a9f4',
     });
 
   const button = (
@@ -50,13 +52,14 @@ export const GestionDesStocks: FC = () => {
   const AddCollectionModalContent: JSX.Element = (
     <>
       <AddCollectionForm
+        setIsAddCollectionOpen={setIsAddCollectionOpen}
         addCollectionData={addCollectionData}
         setAddCollectionData={setAddCollectionData}
       />
     </>
   );
 
-  const content: JSX.Element = <div>hello world</div>;
+  const [content, setContent] = useState<JSX.Element>(<ShowCollections />);
 
   return (
     <>
@@ -69,7 +72,10 @@ export const GestionDesStocks: FC = () => {
         >
           <Plus className="h-10 w-10" />
         </button>
-        <Header title="Gestion Des Stocks" component={button} />
+        <Header
+          title="Gestion Des Stocks"
+          component={button}
+        />
         {content}
         <CosModal
           title="Ajouter un Produit"

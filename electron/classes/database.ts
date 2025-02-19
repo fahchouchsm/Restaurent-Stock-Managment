@@ -2,7 +2,8 @@ import sqlite3 from "sqlite3";
 import path from "path";
 import { app } from "electron";
 import chalk from "chalk";
-import { createCollectionData } from "../interfaces/requests.js";
+import { cosResponseData, createCollectionData } from "../interfaces/requestsInt.js";
+import { dbCollection } from "../interfaces/databaseInt.js";
 
 const DB_PATH = path.join(app.getPath("userData"), "restaurant-stock.db");
 
@@ -10,6 +11,9 @@ class Database {
     public db!: sqlite3.Database;
 
     constructor() {
+        console.log('🔹DB path :' + DB_PATH);
+        console.log('🔹', app.getPath('userData'));
+
         this.connect();
     }
 
@@ -97,6 +101,7 @@ class Database {
         console.log(chalk.green("✅ Database tables ensured."));
     }
 
+    // Collection methods
     public createCollection(data: createCollectionData): void {
         this.db.run(
             `INSERT INTO collections (name, description, color) VALUES (?, ?, ?)`,
@@ -110,41 +115,22 @@ class Database {
             }
         );
     }
-
-    public addStockItem(
-        name: string,
-        quantity: number,
-        unit: string,
-        threshold: number,
-        collectionId: number | null
-    ): void {
-        this.db.run(
-            `INSERT INTO stockItems (name, quantity, unit, threshold, collectionId) VALUES (?, ?, ?, ?, ?)`,
-            [name, quantity, unit, threshold, collectionId],
-            function (err) {
+    public getCollections(): Promise<cosResponseData<dbCollection[]>> {
+        return new Promise((resolve, reject) => {
+            this.db.all("SELECT * FROM collections", (err, rows: dbCollection[]) => {
                 if (err) {
-                    console.error(chalk.red("❌ Error adding stock item:"), err.message);
-                } else {
-                    console.log(chalk.green(`✅ Stock item "${name}" added successfully with ID: ${this.lastID}`));
+                    console.error("❌ Error fetching collections:", err.message);
+                    return reject({ status: false, msg: err.message });
                 }
-            }
-        );
+                console.log("✅ Collections:", rows);
+                resolve({ status: true, data: rows });
+            });
+        });
     }
 
-    public getCollectionItems(collectionId: number): void {
-        this.db.all(
-            `SELECT * FROM stockItems WHERE collectionId = ?`,
-            [collectionId],
-            (err, rows) => {
-                if (err) {
-                    console.error(chalk.red("❌ Error fetching collection items:"), err.message);
-                } else {
-                    console.log(chalk.green("📋 Collection items:"));
-                    console.table(rows);
-                }
-            }
-        );
-    }
+
+
+
 }
 
 const database = new Database();

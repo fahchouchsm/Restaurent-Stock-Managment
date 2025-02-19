@@ -1,5 +1,5 @@
 {
-  "name": "vite-reactts-electron-starter",
+  "name": "restaurent_stock_managment",
   "version": "0.6.0",
   "license": "MIT",
   "main": "dist-electron/index.js",
@@ -14,9 +14,9 @@
     "typescript"
   ],
   "repository": {
-    "url": "https://github.com/lTimeless/vite-reactts-electron-starter"
+    "url": "https://github.com/fahchouchsm/Restaurent-Stock-Managment.git"
   },
-  "productName": "vite-reactts-electron-starter",
+  "productName": "restaurent_stock_managment",
   "scripts": {
     "dev": "vite",
     "dev:electron": "npm run build:electron && electron .",
@@ -44,6 +44,7 @@
     "react-i18next": "^14.1.2",
     "react-loader-spinner": "^6.1.6",
     "react-router-dom": "^7.1.5",
+    "react-toastify": "^11.0.3",
     "sqlite3": "^5.1.7",
     "vite": "^2.8.6",
     "vite-plugin-electron": "^0.28.7",
